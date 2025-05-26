@@ -49,7 +49,7 @@ class ProductDetailViewController: UIViewController {
     
     
     func configure(with foodValues: [String:Any]){   //bu viewmodele gidicek mi
-        enerjiLabel.text = foodValues["Enerji"] as? String ?? "-"
+        enerjiLabel.text = foodValues["energy"] as? String ?? "-"
         proteinLabel.text = foodValues["Protein"] as? String ?? "-"
         fatLabel.text = foodValues["Yağ"] as? String ?? "-"
         carboLabel.text = foodValues["Karbonhidrat"] as? String ?? "-"

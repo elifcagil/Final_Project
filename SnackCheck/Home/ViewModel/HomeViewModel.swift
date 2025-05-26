@@ -42,27 +42,34 @@ class HomeViewModel{
     }
     
     func FetchAllProduct(){
-        firestoreManager.FetchProduct{ [weak self] products in
-            self?.productList = products
-            self?.allProductList = products
-            self?.onFetched?(products)
-            
-        }
+//        firestoreManager.fetchProductListFromAPI{ [weak self] products in
+//            self?.productList = products
+//            self?.allProductList = products
+//            self?.onFetched?(products)
+//            
+//        }
     }
     
     func searchFunc(searchedWord: String) {
-        productList = []
-        if searchedWord.isEmpty {
+        // Önce boşluğu kontrol et
+        guard !searchedWord.isEmpty else {
             productList = allProductList
-        } else {
-            productList = allProductList.filter {
-                let nameMatch = $0.product_name?.lowercased().contains(searchedWord.lowercased()) ?? false
-                let barcodeMatch = $0.barcode?.contains(searchedWord) ?? false
-                return nameMatch || barcodeMatch
+            onFetched?(productList)
+            return
+        }
+
+        firestoreManager.fetchProductByBarcode(searchedWord) { [weak self] product in
+            DispatchQueue.main.async {
+                if let product = product {
+                    self?.productList = [product] // sadece bir ürün gösterilecek
+                } else {
+                    self?.productList = [] // sonuç yok
+                }
+                self?.onFetched?(self?.productList ?? [])
             }
         }
-        onFetched?(productList) // Arama yaptıktan sonra aynı üründen iki tane görüntüüyorum nasıl düzeltebilrim 
     }
+
 
 }
 

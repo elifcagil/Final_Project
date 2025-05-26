@@ -19,6 +19,7 @@ class PersonalViewModel{
         self.firestoremanager = firetoreManager
     }
     
+    
     //MARK: -HelperMethods
     
     func PersonelInfo(){

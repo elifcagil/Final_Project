@@ -10,6 +10,7 @@ import UIKit
 class PersonalViewController: UIViewController {
     
     //MARK: -Properties
+    
     @IBOutlet var userimage: UIImageView!
     @IBOutlet var settingtableview: UITableView!
     @IBOutlet weak var userNameLabel: UILabel!
@@ -60,9 +61,9 @@ class PersonalViewController: UIViewController {
             switch result {
             case .success():
                 DispatchQueue.main.async {
-                                if let loginVC = self.storyboard?.instantiateViewController(withIdentifier: "LoginViewController") as? LoginViewController {
-                                    loginVC.modalPresentationStyle = .fullScreen
-                                    self.present(loginVC, animated: true, completion: nil)
+                    if let loginVC = self.storyboard?.instantiateViewController(withIdentifier: "LoginViewController") as? LoginViewController {
+                    loginVC.modalPresentationStyle = .fullScreen
+                    self.present(loginVC, animated: true, completion: nil)
                                 }
                             }
             case .failure(let error):

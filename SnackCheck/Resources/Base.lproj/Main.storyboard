@@ -785,7 +785,7 @@ Tuz: 0.46 g</string>
                     </tabBarItem>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="VIX-iE-2q6">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="104.33333333333334"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="tintColor" red="0.20784313730000001" green="0.08235294118" blue="0.3921568627" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </navigationBar>
@@ -1030,6 +1030,7 @@ Tuz: 0.46 g</string>
                                 </buttonConfiguration>
                                 <connections>
                                     <action selector="loginButton:" destination="emW-cI-vhL" eventType="touchUpInside" id="N2h-9H-PtV"/>
+                                    <segue destination="VyA-2W-8H8" kind="presentation" id="8br-5z-gkp"/>
                                 </connections>
                             </button>
                             <stackView hidden="YES" opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="vdQ-0f-UvW">
@@ -1158,6 +1159,7 @@ Tuz: 0.46 g</string>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
+        <segue reference="SKi-hZ-sVZ"/>
         <segue reference="Gqf-tx-MJj"/>
     </inferredMetricsTieBreakers>
     <resources>

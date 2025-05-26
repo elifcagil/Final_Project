@@ -22,8 +22,27 @@ class ProductButtonDetailViewController: UIViewController {
         if let product = viewModel.product{
             productbrandLabel.text = product.product_brand
             productNameLabel.text = product.product_name
-            prodcutImageView.image = UIImage(named: product.product_image!)
+            if let urlString = product.product_image,
+               let url = URL(string: urlString) {
+                downloadImage(from: url) { [weak self] image in
+                    DispatchQueue.main.async {
+                        self?.prodcutImageView.image = image
+                    }
+                }
+            } else {
+                prodcutImageView.image = UIImage(systemName: "photo") // fallback
+            }
         }
+    }
+    private func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            if let data = data, let image = UIImage(data: data) {
+                completion(image)
+            } else {
+                print("❌ Görsel indirilemedi: \(error?.localizedDescription ?? "bilinmiyor")")
+                completion(nil)
+            }
+        }.resume()
     }
     
     //MARK: -IBActionFunc

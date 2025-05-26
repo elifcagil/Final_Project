@@ -28,7 +28,7 @@ class HomeViewController: UIViewController{
         delegateSetUp()
         SetUpUI()
         
-        viewModel.FetchAllProduct()
+       
     }
     
 //MARK: -HelperMethods
@@ -63,6 +63,7 @@ class HomeViewController: UIViewController{
                 self?.allProductCollectionView.reloadData()
             }
         }
+        viewModel.FetchAllProduct()
         if viewModel.isSearch {
             viewModel.searchFunc(searchedWord:viewModel.searchedWord)
         }else{
