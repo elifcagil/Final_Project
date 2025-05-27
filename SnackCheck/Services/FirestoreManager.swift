@@ -6,6 +6,9 @@
 //
 
 import Foundation
+import FirebaseCore
+import FirebaseAuth
+import FirebaseFirestore
 
 class FirestoreManager{
     var tempList: [Product] = []
@@ -26,7 +29,7 @@ class FirestoreManager{
     //MARK: -ProductsFunc
     
     func fetchProductByBarcode(_ barcode: String, completion: @escaping (Product?) -> Void) {
-        guard let getURL = URL(string: "http://localhost:5050/api/products/\(barcode)") else {
+        guard let getURL = URL(string: "http://localhost:3000/api/products/\(barcode)") else {
             print("❌ Geçersiz GET URL")
             completion(nil)
             return
@@ -40,7 +43,7 @@ class FirestoreManager{
                 // 🔁 Ürün bulunamadı → POST ile ekle
                 print("⚠️ Ürün bulunamadı, POST ile ekleniyor...")
 
-                guard let postURL = URL(string: "http://localhost:5050/api/products/\(barcode)") else {
+                guard let postURL = URL(string: "http://localhost:3000/api/products/\(barcode)") else {
                     print("❌ Geçersiz POST URL")
                     completion(nil)
                     return
@@ -114,10 +117,130 @@ class FirestoreManager{
     
     func createUser(name:String,surname:String, email:String, password:String,completion:@escaping (Result<Void,Error>)->(Void)){
         
-    }
+        guard let url = URL(string: "http://localhost:3000/api/auth/register") else {
+                   completion(.failure(NSError(domain: "Geçersiz URL", code: -1)))
+                   return
+               }
+               
+               let requestBody: [String: Any] = [
+                   "firstName": name,
+                   "lastName": surname,
+                   "email": email,
+                   "password": password
+               ]
+               
+               var request = URLRequest(url: url)
+               request.httpMethod = "POST"
+               request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+               
+               do {
+                   request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
+               } catch {
+                   completion(.failure(error))
+                   return
+               }
+               
+               URLSession.shared.dataTask(with: request) { data, response, error in
+                   
+                   // 1. Hata varsa
+                   if let error = error {
+                       completion(.failure(error))
+                       return
+                   }
+                   
+                   // 2. Geçerli response kontrolü
+                   guard let httpResponse = response as? HTTPURLResponse else {
+                       completion(.failure(NSError(domain: "Geçersiz yanıt", code: -2)))
+                       return
+                   }
+                   
+                   // 3. Status kodu kontrol
+                   guard (200...299).contains(httpResponse.statusCode) else {
+                       let statusError = NSError(domain: "Sunucu hatası", code: httpResponse.statusCode)
+                       completion(.failure(statusError))
+                       return
+                   }
+                   
+                   // 4. JSON çözümleme
+                   guard let data = data else {
+                       completion(.failure(NSError(domain: "Boş veri", code: -3)))
+                       return
+                   }
+                   
+                   do {
+                       let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+                       
+                       if let _ = json?["uid"] as? String {
+                           completion(.success(()))
+                       } else if let errorMessage = json?["error"] as? String {
+                           let backendError = NSError(domain: errorMessage, code: -4)
+                           completion(.failure(backendError))
+                       } else {
+                           let unknownError = NSError(domain: "Bilinmeyen hata", code: -5)
+                           completion(.failure(unknownError))
+                       }
+                   } catch {
+                       completion(.failure(error))
+                   }
+                   
+               }.resume()
+           }
     
+       
+    let db = Firestore.firestore()
     
     func loginUser(email:String, password:String,completion:@escaping(Result<Void,Error>)->(Void)){
+        
+        Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+                   if let error = error {
+                       print("kullanıcı girişi yapılamadı")
+                       completion(.failure(error))
+                       return
+                   }
+                   guard let uid = authResult?.user.uid else {
+                       completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey:"kullanıcı id sine erişilemedi"])))
+
+                       return
+                   }
+                   
+                   let userRef = self.db.collection("users").document(uid)
+                   userRef.getDocument { document , error in
+                       if let error = error {
+                           try? Auth.auth().signOut()
+                           completion(.failure(error))
+                           return
+                       }
+                       guard let document = document,document.exists else {
+                           try? Auth.auth().signOut()
+                           completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey:"kullanıcı firestorede bulunamadı"])))
+                           return
+                       }
+                       
+                       completion(.success(()))
+                   }
+                   
+               }
+              
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
     }

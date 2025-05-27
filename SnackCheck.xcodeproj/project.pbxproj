@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2DECCEAB2DE4E046009A78B8 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 2DECCEAA2DE4E046009A78B8 /* FirebaseAuth */; };
+		2DECCEAD2DE4E0FF009A78B8 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 2DECCEAC2DE4E0FF009A78B8 /* FirebaseCore */; };
+		2DECCEAF2DE4E148009A78B8 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 2DECCEAE2DE4E148009A78B8 /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		2D1810D92D8061CE0082C71F /* SnackCheck.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnackCheck.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +42,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2DECCEAD2DE4E0FF009A78B8 /* FirebaseCore in Frameworks */,
+				2DECCEAB2DE4E046009A78B8 /* FirebaseAuth in Frameworks */,
+				2DECCEAF2DE4E148009A78B8 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +95,9 @@
 			);
 			name = SnackCheck;
 			packageProductDependencies = (
+				2DECCEAA2DE4E046009A78B8 /* FirebaseAuth */,
+				2DECCEAC2DE4E0FF009A78B8 /* FirebaseCore */,
+				2DECCEAE2DE4E148009A78B8 /* FirebaseFirestore */,
 			);
 			productName = SnackCheckKategoriler;
 			productReference = 2D1810D92D8061CE0082C71F /* SnackCheck.app */;
@@ -116,6 +128,7 @@
 			mainGroup = 2D1810D02D8061CE0082C71F;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				2DECCEA92DE4E046009A78B8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2D1810DA2D8061CE0082C71F /* Products */;
@@ -347,6 +360,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2DECCEA92DE4E046009A78B8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.13.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2DECCEAA2DE4E046009A78B8 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2DECCEA92DE4E046009A78B8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		2DECCEAC2DE4E0FF009A78B8 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2DECCEA92DE4E046009A78B8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		2DECCEAE2DE4E148009A78B8 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2DECCEA92DE4E046009A78B8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2D1810D12D8061CE0082C71F /* Project object */;
 }
