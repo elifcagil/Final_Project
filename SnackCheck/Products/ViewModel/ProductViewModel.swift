@@ -26,7 +26,7 @@ class ProductViewModel {
     init(fireStoreManager: FirestoreManager) {
         self.firestoreManager = fireStoreManager
     }
-
+    
     // MARK: - Helper Methods
     
     /// Fetch to products by catefory
@@ -43,13 +43,29 @@ class ProductViewModel {
     
     
     func favoriteProduct(with productId :String?){
-        guard let productId = productId,
-              let product = productList.first(where: { $0.product_id == productId})
-        else {return}
+        guard
+            let productId = productId,
+            let product = productList.first(where: { $0.product_id == productId}),
+            let barcode = product.barcode
+        else { return }
+        
         product.isFavorites?.toggle()
-        firestoreManager.updateFavorite(product_id: productId, favorite: product.isFavorites ?? false)
+        if product.isFavorites == true {
+            firestoreManager.updateFavorite(productCode: barcode) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let message):
+                        print("🎉 Favorilere eklendi: \(message)")
+                    case .failure(let error):
+                        print("❌ Favori eklenemedi: \(error.localizedDescription)")
+                    }
+                }
+            }
+        } else {
+            // Eğer burada favoriden çıkarma işlemi yapılacaksa, ayrı bir endpoint olabilir (isteğe bağlı)
+            print("⭐️ Favoriden çıkarıldı (sunucuya istek atılmadı).")
+        }
+        
         onFavoriteChanged?()
-        
-        
     }
 }

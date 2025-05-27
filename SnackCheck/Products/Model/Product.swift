@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Product{
+class Product:Codable{
     
     var product_id : String?
     var product_name : String?
@@ -15,12 +15,12 @@ class Product{
     var product_image: String?
     var category : String?
     var ingeridents: String?
-    var food_values: [String:Any]
+    var food_values: [String:String]
     var isFavorites:Bool?
     var barcode :String?
     
     
-    init(product_id:String,product_name:String,product_brand:String,product_image:String,category:String?,ingeridents:String,food_values:[String:Any],isFavorites:Bool?,barcode:String){
+    init(product_id:String,product_name:String,product_brand:String,product_image:String,category:String?,ingeridents:String,food_values:[String:String],isFavorites:Bool?,barcode:String){
         self.product_id = product_id
         self.product_name = product_name
         self.product_brand = product_brand

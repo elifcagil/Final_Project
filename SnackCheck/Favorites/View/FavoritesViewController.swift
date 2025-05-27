@@ -54,8 +54,30 @@ extension FavoritesViewController : UITableViewDelegate, UITableViewDataSource {
         cell.productName.text = fav.product_name
         cell.productImage.image = UIImage(named: fav.product_image!)
         
+        if let urlString = fav.product_image,
+           let url = URL(string: urlString) {
+            downloadImage(from: url) { [weak self] image in
+                DispatchQueue.main.async {
+                    cell.productImage.image = image
+                }
+            }
+        } else {
+            cell.productImage.image = UIImage(systemName: "photo") // fallback
+        }
+
+        
         return cell
         
+    }
+    private func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            if let data = data, let image = UIImage(data: data) {
+                completion(image)
+            } else {
+                print("❌ Görsel indirilemedi: \(error?.localizedDescription ?? "bilinmiyor")")
+                completion(nil)
+            }
+        }.resume()
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

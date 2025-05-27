@@ -16,9 +16,18 @@ class FirestoreManager{
     
     //MARK: -PersonalFetch
     
-    func FetchPersonel(completion: @escaping ([PersonalModel]) -> Void) {
-        
+    func FetchPersonel(completion: @escaping ([String]) -> Void) {
+        let personelInfoTitles = [
+            "Bildirimler",
+            "Kişisel Bilgiler",
+            "Ayarlar",
+            "Oturumu Kapat",
+            "Hesabımı Kalıcı Olarak Sil",
+            "Sağlık Verileri"
+        ]
+        completion(personelInfoTitles)
     }
+
     
     //MARK: -CategoriesFunc
     
@@ -90,7 +99,7 @@ class FirestoreManager{
                         product_image: json["image_url"] as? String ?? "",
                         category: json["categories"] as? String ?? "",
                         ingeridents: json["ingredients_text"] as? String ?? "",
-                        food_values: json["nutriments"] as? [String: Any] ?? [:],
+                        food_values: json["nutriments"] as? [String: String] ?? [:],
                         isFavorites: false,
                         barcode: json["code"] as? String ?? ""
                     )
@@ -220,50 +229,268 @@ class FirestoreManager{
                    }
                    
                }
-              
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
     }
     
     func logOutUser(completion:@escaping (Result <Void ,Error>) -> Void){
+        do{
+                    try Auth.auth().signOut()
+                    completion(.success(()))
+                }catch let signOutError {
+                    completion(.failure(signOutError))
+                    
+                }
         
     }
     
     func deleteUser(completion: @escaping (Result<Void,Error>) -> Void){
+        guard let user = Auth.auth().currentUser else {
+                   completion(.failure(NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "Kullanıcı oturumu bulunamadı."])))
+                   return
+               }
+               let uid = user.uid
+               db.collection("users").document(uid).delete { error in
+                   if let error = error {
+                       completion(.failure(error))
+                       return
+                   }
+                   user.delete{ error in
+                       if let error = error {
+                           print("Kullanıcı silinemedi \(error.localizedDescription)")
+                           completion(.failure(error))
+                           return
+                       }
+                       completion(.success(()))
+                   }
+               }
         
     }
     
     func currenUserInfo(completion: @escaping (Result<User,Error>) -> (Void)){
-        
+        guard let user = Auth.auth().currentUser else {
+                    completion(.failure(NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "Kullanıcı oturumu bulunamadı."])))
+                    return
+                }
+                let uid = user.uid
+                db.collection("users").document(uid).getDocument{ snapshot,error in
+                    if let error = error {
+                        completion(.failure(error))
+                        return
+                    }
+                    if let data = snapshot?.data(){
+                        let name = data["firstName"] as? String ?? ""
+                        let id = data["id"] as? String ?? ""
+                        let surname = data["lastName"] as? String ?? ""
+                        let email = data["email"] as? String ?? ""
+                        let user = User(id: id, name: name, surname: surname, email: email)
+                        completion(.success(user))
+                    }
+                    
+                }
         
     }
     //MARK: -FavoritesFunc
     
-    func fetchFavorites(completion:@escaping ([Product])-> Void){
+    func fetchFavorites(completion: @escaping (Result<[Product], Error>) -> Void) {
+        guard let uid = Auth.auth().currentUser?.uid else {
+                completion(.failure(NSError(domain: "AuthError", code: 401, userInfo: [NSLocalizedDescriptionKey: "Kullanıcı oturumu bulunamadı."])))
+                return
+            }
+
+            // URL’yi uid ile birlikte oluşturuyoruz
+            let urlString = "http://localhost:3000/api/favorites?uid=\(uid)"
+            guard let url = URL(string: urlString) else {
+                completion(.failure(NSError(domain: "URLError", code: 400, userInfo: [NSLocalizedDescriptionKey: "Geçersiz URL"])))
+                return
+            }
+
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ Favori ürünler alınamadı: \(error.localizedDescription)")
+                completion(.failure(NSError(domain: "URLError", code: 400, userInfo: [NSLocalizedDescriptionKey: "urun alınammadı"])))
+                return
+            }
+
+            guard let data = data else {
+                print("❌ Veri gelmedi")
+                completion(.failure(NSError(domain: "URLError", code: 400, userInfo: [NSLocalizedDescriptionKey: "Veri yok"])))
+                return
+            }
+
+            // Gelen veriyi kontrol etmek için:
+            print("📦 Favori ürünler JSON:\n", String(data: data, encoding: .utf8) ?? "Veri çözümlenemedi")
+
+            do {
+                // JSON dizisini manuel decode ediyoruz
+                if let jsonArray = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] {
+                    let products: [Product] = jsonArray.compactMap { json in
+                        return Product(
+                            product_id: json["id"] as? String ?? "",
+                            product_name: json["productName"] as? String ?? "",
+                            product_brand: json["brands"] as? String ?? "",
+                            product_image: json["productImage"] as? String ?? "",
+                            category: json["categories"] as? String ?? "",
+                            ingeridents: json["ingredients_text"] as? String ?? "",
+                            food_values: json["nutriments"] as? [String: String] ?? [:],
+                            isFavorites: true,
+                            barcode: json["productCode"] as? String ?? ""
+                        )
+                    }
+
+                    completion(.success(products))
+
+                } else {
+                    print("❌ JSON formatı bekleneni karşılamıyor")
+                    completion(.failure(NSError(domain: "ParseError", code: 500, userInfo: [NSLocalizedDescriptionKey: "JSON formatı hatalı."])))
+                }
+
+            } catch {
+                print("❌ JSON parse hatası: \(error)")
+                completion(.failure(error))
+            }
+
+        }.resume()
         
+           
+       }
+    
+    func deleteFavorite(barcode: String, completion: @escaping (Result<String, Error>) -> Void) {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            completion(.failure(NSError(domain: "Giriş yapmış kullanıcı bulunamadı.", code: 401)))
+            return
+        }
+        guard let url = URL(string: "http://localhost:3000/api/favorites") else {
+            completion(.failure(NSError(domain: "URLError", code: 400, userInfo: [NSLocalizedDescriptionKey: "Geçersiz URL"])))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "uid": uid,
+            "productCode": barcode
+        ]
+
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+        } catch {
+            completion(.failure(NSError(domain: "EncodingError", code: 500, userInfo: [NSLocalizedDescriptionKey: "JSON body encode edilemedi."])))
+            return
+        }
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ Silme isteği hatası: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                completion(.failure(NSError(domain: "ResponseError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Geçersiz yanıt."])))
+                return
+            }
+
+            guard (200...299).contains(httpResponse.statusCode), let data = data else {
+                let errorMessage = String(data: data ?? Data(), encoding: .utf8) ?? "Sunucu hatası"
+                completion(.failure(NSError(domain: "ServerError", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])))
+                return
+            }
+
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let message = json["message"] as? String {
+                    print("✅ Favori silindi: \(message)")
+                    completion(.success(message))
+                } else {
+                    completion(.failure(NSError(domain: "ParseError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Yanıt parse edilemedi."])))
+                }
+            } catch {
+                completion(.failure(error))
+            }
+
+        }.resume()
     }
-    func updateFavorite(product_id:String,favorite:Bool){
-        
-        
-    }
+
+    
+   
+            
+            // 1. Firebase Auth ile kullanıcı UID'sini al
+    func updateFavorite(productCode: String, completion: @escaping (Result<String, Error>) -> Void) {
+           
+           // 1. Firebase Auth ile kullanıcı UID'sini al
+           guard let uid = Auth.auth().currentUser?.uid else {
+               completion(.failure(NSError(domain: "Giriş yapmış kullanıcı bulunamadı.", code: 401)))
+               return
+           }
+           
+           // 2. URL oluştur
+           guard let url = URL(string: "http://localhost:3000/api/favorites") else {
+               completion(.failure(NSError(domain: "Geçersiz URL", code: -1)))
+               return
+           }
+           
+           // 3. İstek gövdesi
+           let body: [String: Any] = [
+               "uid": uid,
+               "productCode": productCode
+           ]
+           
+           // 4. URLRequest ayarları
+           var request = URLRequest(url: url)
+           request.httpMethod = "POST"
+           request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+           
+           do {
+               request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+           } catch {
+               completion(.failure(error))
+               return
+           }
+           
+           // 5. URLSession ile istek
+           URLSession.shared.dataTask(with: request) { data, response, error in
+               
+               if let error = error {
+                   completion(.failure(error))
+                   return
+               }
+               
+               guard let httpResponse = response as? HTTPURLResponse,
+                     let data = data else {
+                   completion(.failure(NSError(domain: "Yanıt alınamadı.", code: -2)))
+                   return
+               }
+               
+               switch httpResponse.statusCode {
+               case 200:
+                   if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let message = json["message"] as? String {
+                       completion(.success(message))
+                   } else {
+                       completion(.success("Favori başarıyla eklendi."))
+                   }
+                   
+               case 404:
+                   completion(.failure(NSError(domain: "Ürün bulunamadı, favorilere eklenemedi.", code: 404)))
+                   
+               case 400:
+                   if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let errorMessage = json["error"] as? String {
+                       completion(.failure(NSError(domain: errorMessage, code: 400)))
+                   } else {
+                       completion(.failure(NSError(domain: "Geçersiz istek.", code: 400)))
+                   }
+                   
+               default:
+                   completion(.failure(NSError(domain: "Bilinmeyen hata oluştu.", code: httpResponse.statusCode)))
+               }
+               
+           }.resume()
+       }
+
+    
 }

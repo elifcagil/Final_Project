@@ -9,8 +9,8 @@ class PersonalViewModel{
     
     //MARK: -Properties
     
-    var personelItems :[PersonalModel] = []
-    var onFetched : (([PersonalModel]) -> Void)?
+    var personelItems :[String] = []
+    var onFetched : (([String]) -> Void)?
     var firestoremanager:FirestoreManager!
    
     
