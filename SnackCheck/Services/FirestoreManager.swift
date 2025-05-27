@@ -101,7 +101,15 @@ class FirestoreManager{
                         ingeridents: json["ingredients_text"] as? String ?? "",
                         food_values: json["nutriments"] as? [String: String] ?? [:],
                         isFavorites: false,
-                        barcode: json["code"] as? String ?? ""
+                        barcode: json["code"] as? String ?? "",
+                        carbohydrates: json["carbohydrates"] as? Int ?? 0,
+                        energy: json["energy_kcal"] as? Int ?? 0,
+                        fat: json["fat"] as? Int ?? 0,
+                        proteins: json["proteins"] as? Int ?? 0,
+                        salt: json["salt"] as? Double ?? 0,
+                        saturated_fat: json["saturated_fat"] as? Double ?? 0,
+                        sugars: json["sugars"] as? Int ?? 0,
+                        fiber: json["sodium"]as? Double ?? 0
                     )
                     completion(product)
                 } else {
@@ -335,7 +343,15 @@ class FirestoreManager{
                             ingeridents: json["ingredients_text"] as? String ?? "",
                             food_values: json["nutriments"] as? [String: String] ?? [:],
                             isFavorites: true,
-                            barcode: json["productCode"] as? String ?? ""
+                            barcode: json["productCode"] as? String ?? "",
+                            carbohydrates: json["carbohydrates"] as? Int ?? 0,
+                            energy: json["energy_kcal"] as? Int ?? 0,
+                            fat: json["fat"] as? Int ?? 0,
+                            proteins: json["proteins"] as? Int ?? 0,
+                            salt: json["salt"] as? Double ?? 0,
+                            saturated_fat: json["saturated_fat"] as? Double ?? 0,
+                            sugars: json["sugars"] as? Int ?? 0,
+                            fiber: json["sodium"]as? Double ?? 0
                         )
                     }
 

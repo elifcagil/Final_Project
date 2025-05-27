@@ -56,13 +56,13 @@ extension FavoritesViewController : UITableViewDelegate, UITableViewDataSource {
         
         if let urlString = fav.product_image,
            let url = URL(string: urlString) {
-            downloadImage(from: url) { [weak self] image in
+            downloadImage(from: url) { image in
                 DispatchQueue.main.async {
                     cell.productImage.image = image
                 }
             }
         } else {
-            cell.productImage.image = UIImage(systemName: "photo") // fallback
+            cell.productImage.image = UIImage(systemName: "photo") 
         }
 
         
