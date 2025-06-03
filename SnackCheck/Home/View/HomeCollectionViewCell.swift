@@ -18,6 +18,7 @@ class HomeCollectionViewCell: UICollectionViewCell {
     @IBOutlet var productBrandLabel: UILabel!
     @IBOutlet var productNameLabel: UILabel!
     @IBAction func addFavoritesButton(_ sender: UIButton) {
+        
         onTapFavorite?(product?.product_id)
     }
     

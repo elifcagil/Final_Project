@@ -37,6 +37,70 @@ class FirestoreManager{
     
     //MARK: -ProductsFunc
     
+    func fetchAllProducts(completion: @escaping ([Product]) -> Void) {
+            guard let url = URL(string: "http://localhost:3000/api/products/all") else {
+                print("❌ Geçersiz URL")
+                completion([])
+                return
+            }
+
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("❌ Hata oluştu: \(error.localizedDescription)")
+                    completion([])
+                    return
+                }
+
+                guard let data = data else {
+                    print("❌ Veri alınamadı")
+                    completion([])
+                    return
+                }
+
+                do {
+                    if let jsonArray = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] {
+                        var products: [Product] = []
+
+                        for json in jsonArray {
+                            let product = Product(
+                                product_id: json["id"] as? String ?? "",
+                                product_name: json["name"] as? String ?? "",
+                                product_brand: json["brands"] as? String ?? "",
+                                product_image: json["image_url"] as? String ?? "",
+                                category: json["categories"] as? String ?? "",
+                                ingeridents: json["ingredients_text"] as? String ?? "",
+                                food_values: json["nutriments"] as? [String: String] ?? [:],
+                                isFavorites: false,
+                                barcode: json["code"] as? String ?? "",
+                                carbohydrates: json["carbohydrates"] as? Int ?? 0,
+                                energy: json["energy_kcal"] as? Int ?? 0,
+                                fat: json["fat"] as? Int ?? 0,
+                                proteins: json["proteins"] as? Int ?? 0,
+                                salt: json["salt"] as? Double ?? 0,
+                                saturated_fat: json["saturated_fat"] as? Double ?? 0,
+                                sugars: json["sugars"] as? Int ?? 0,
+                                fiber: json["sodium"] as? Double ?? 0
+                                
+                            )
+                            products.append(product)
+                        }
+
+                        completion(products)
+                    } else {
+                        print("❌ JSON array format hatası")
+                        completion([])
+                    }
+                } catch {
+                    print("❌ JSON parse hatası: \(error)")
+                    completion([])
+                }
+
+            }.resume()
+        }
+    
     func fetchProductByBarcode(_ barcode: String, completion: @escaping (Product?) -> Void) {
         guard let getURL = URL(string: "http://localhost:3000/api/products/\(barcode)") else {
             print("❌ Geçersiz GET URL")

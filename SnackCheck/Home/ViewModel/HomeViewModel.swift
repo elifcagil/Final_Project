@@ -57,12 +57,12 @@ class HomeViewModel{
     }
     
     func FetchAllProduct(){
-//        firestoreManager.fetchProductListFromAPI{ [weak self] products in
-//            self?.productList = products
-//            self?.allProductList = products
-//            self?.onFetched?(products)
-//            
-//        }
+        firestoreManager.fetchAllProducts{ [weak self] products in
+            self?.productList = products
+            self?.allProductList = products
+            self?.onFetched?(products)
+            
+        }
     }
     
     func searchFunc(searchedWord: String) {

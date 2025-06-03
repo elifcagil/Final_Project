@@ -26,6 +26,7 @@ class Product:Codable{
     var saturated_fat:Double?
     var sugars:Int?
     var fiber:Double?
+
     
     
     init(product_id:String,product_name:String,product_brand:String,product_image:String,category:String?,ingeridents:String,food_values:[String:String],isFavorites:Bool?,barcode:String,carbohydrates : Int?,energy : Int?,fat:Int?,proteins: Int?,
