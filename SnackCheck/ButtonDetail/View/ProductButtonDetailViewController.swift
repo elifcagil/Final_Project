@@ -79,12 +79,12 @@ class ProductButtonDetailViewController: UIViewController {
                 ViewModel.context = product.ingeridents
                 
             case "analize" :
-                ViewModel.buttonName = "Ürün Analizi"
-                ViewModel.context = "Gemini AI dan gelicek burası" //burası productdetail viewmodelden gelicek viewmodel firestoremanagerden çekicek 
+                ViewModel.buttonName = "Analiz"
+                ViewModel.context = product.aiComment //burası productdetail viewmodelden gelicek viewmodel firestoremanagerden çekicek
                 
             case "alergen" :
                 ViewModel.buttonName = "Alerjen Uyarısı"
-                ViewModel.context = "Gemini AI dan gelecek"//burası productdetail viewmodelden gelicek viewmodel firestoremanagerden çekicek
+                ViewModel.context = product.analize//burası productdetail viewmodelden gelicek viewmodel firestoremanagerden çekicek
                 
             case "foodValue" :
                 ViewModel.buttonName = "Besin Değerleri"

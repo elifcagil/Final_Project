@@ -82,8 +82,10 @@ class FirestoreManager{
                                 salt: json["salt"] as? Double ?? 0,
                                 saturated_fat: json["saturated_fat"] as? Double ?? 0,
                                 sugars: json["sugars"] as? Int ?? 0,
-                                fiber: json["sodium"] as? Double ?? 0
-                                
+                                fiber: json["sodium"] as? Double ?? 0,
+                                analize: json["alerjenUyari"] as? String ?? "",
+                                aiComment:json["yorum"] as? String ?? ""
+
                             )
                             products.append(product)
                         }
@@ -153,7 +155,7 @@ class FirestoreManager{
                 completion(nil)
                 return
             }
-
+            print("📦 Gelen ürünler JSON:\n", String(data: data, encoding: .utf8) ?? "Veri çözümlenemedi")
             do {
                 if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                     let product = Product(
@@ -173,7 +175,9 @@ class FirestoreManager{
                         salt: json["salt"] as? Double ?? 0,
                         saturated_fat: json["saturated_fat"] as? Double ?? 0,
                         sugars: json["sugars"] as? Int ?? 0,
-                        fiber: json["sodium"]as? Double ?? 0
+                        fiber: json["sodium"]as? Double ?? 0,
+                        analize: json["alerjenUyari"] as? String ?? "",
+                        aiComment: json["yorum"] as? String ?? ""
                     )
                     completion(product)
                 } else {
@@ -401,7 +405,7 @@ class FirestoreManager{
                         return Product(
                             product_id: json["id"] as? String ?? "",
                             product_name: json["productName"] as? String ?? "",
-                            product_brand: json["brands"] as? String ?? "",
+                            product_brand: json["productBrands"] as? String ?? "",
                             product_image: json["productImage"] as? String ?? "",
                             category: json["categories"] as? String ?? "",
                             ingeridents: json["ingredients_text"] as? String ?? "",
@@ -415,7 +419,9 @@ class FirestoreManager{
                             salt: json["salt"] as? Double ?? 0,
                             saturated_fat: json["saturated_fat"] as? Double ?? 0,
                             sugars: json["sugars"] as? Int ?? 0,
-                            fiber: json["sodium"]as? Double ?? 0
+                            fiber: json["sodium"]as? Double ?? 0,
+                            analize: json["alerjenUyari"] as? String ?? "",
+                            aiComment: json["yorum"] as? String ?? ""
                         )
                     }
 

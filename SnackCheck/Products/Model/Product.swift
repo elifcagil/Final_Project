@@ -26,11 +26,13 @@ class Product:Codable{
     var saturated_fat:Double?
     var sugars:Int?
     var fiber:Double?
+    var analize : String?
+    var aiComment :String?
 
     
     
     init(product_id:String,product_name:String,product_brand:String,product_image:String,category:String?,ingeridents:String,food_values:[String:String],isFavorites:Bool?,barcode:String,carbohydrates : Int?,energy : Int?,fat:Int?,proteins: Int?,
-         salt:Double?,saturated_fat:Double?,sugars:Int?,fiber:Double?){
+         salt:Double?,saturated_fat:Double?,sugars:Int?,fiber:Double?,analize:String?,aiComment:String?){
         self.product_id = product_id
         self.product_name = product_name
         self.product_brand = product_brand
@@ -48,6 +50,8 @@ class Product:Codable{
         self.saturated_fat = saturated_fat
         self.sugars = sugars
         self.fiber = fiber
+        self.analize = analize
+        self.aiComment = aiComment
         
     
     }

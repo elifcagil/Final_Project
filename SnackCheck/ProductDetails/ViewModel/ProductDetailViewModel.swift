@@ -7,6 +7,7 @@
 
 import Foundation
 class ProductDetailViewModel{
+    
     var buttonName:String?
     var context :String?
     var product: Product?

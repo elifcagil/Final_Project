@@ -64,6 +64,7 @@ extension FavoritesViewController : UITableViewDelegate, UITableViewDataSource {
         } else {
             cell.productImage.image = UIImage(systemName: "photo") 
         }
+     
 
         
         return cell
