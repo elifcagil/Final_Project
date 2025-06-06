@@ -122,16 +122,18 @@ extension HomeViewController : UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
-        viewModel.searchedWord = searchText
-        if viewModel.searchedWord == "" {
-            viewModel.isSearch = false
-            viewModel.FetchAllProduct()
-            
-        }else{
-            viewModel.isSearch = true
-            viewModel.searchFunc(searchedWord: viewModel.searchedWord)
-        }
-        print("Arama Sonucu : \(viewModel.searchedWord)")
+        let trimmedSearch = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+            viewModel.searchedWord = trimmedSearch
+
+            if trimmedSearch.isEmpty {
+                viewModel.isSearch = false
+                viewModel.FetchAllProduct()
+            } else {
+                viewModel.isSearch = true
+                viewModel.searchFunc(searchedWord: trimmedSearch)
+            }
+
+            print("🔍 Arama Sonucu: [\(trimmedSearch)]")
     }
     func cameraItems(){
         if let cameraImage = UIImage(systemName: "camera") { //sistemden çektiğimiz resmin doğru geldiğini kontrol ettik

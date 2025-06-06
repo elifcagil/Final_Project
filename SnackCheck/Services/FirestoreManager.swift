@@ -103,10 +103,10 @@ class FirestoreManager{
             }.resume()
         }
     
-    func fetchProductByBarcode(_ barcode: String, completion: @escaping (Product?) -> Void) {
+    func fetchProductByBarcode(_ barcode: String, retryCount: Int = 0, completion: @escaping (Product?) -> Void) {
+        let cleanedBarcode = barcode.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        
-        guard let getURL = URL(string: "http://localhost:3000/api/products/\(barcode)") else {
+        guard let getURL = URL(string: "http://localhost:3000/api/products/\(cleanedBarcode)") else {
             print("❌ Geçersiz GET URL")
             completion(nil)
             return
@@ -117,10 +117,17 @@ class FirestoreManager{
 
         URLSession.shared.dataTask(with: getRequest) { data, response, error in
             if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 404 {
-                // 🔁 Ürün bulunamadı → POST ile ekle
+                // 🔁 Sadece 1 kez POST etmeyi dene
+                guard retryCount == 0 else {
+                    print("🛑 Ürün hala bulunamadı. Döngü durduruluyor.")
+                    completion(nil)
+                    return
+                }
+
                 print("⚠️ Ürün bulunamadı, POST ile ekleniyor...")
 
-                guard let postURL = URL(string: "http://localhost:3000/api/products/\(barcode)") else {
+                // ✅ POST isteği
+                guard let postURL = URL(string: "http://localhost:3000/api/products") else {
                     print("❌ Geçersiz POST URL")
                     completion(nil)
                     return
@@ -128,8 +135,12 @@ class FirestoreManager{
 
                 var postRequest = URLRequest(url: postURL)
                 postRequest.httpMethod = "POST"
+                postRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                
+                let payload = ["barcode": cleanedBarcode]
+                postRequest.httpBody = try? JSONSerialization.data(withJSONObject: payload)
 
-                URLSession.shared.dataTask(with: postRequest) { [self] _, postResponse, postError in
+                URLSession.shared.dataTask(with: postRequest) { _, _, postError in
                     if let postError = postError {
                         print("❌ POST hatası: \(postError.localizedDescription)")
                         completion(nil)
@@ -138,16 +149,15 @@ class FirestoreManager{
 
                     print("✅ Ürün başarıyla eklendi, tekrar GET yapılıyor...")
 
-                    // ✅ POST sonrası tekrar GET yap
-                    fetchProductByBarcode(barcode, completion: completion)
+                    // 🔁 POST sonrası tekrar GET
+                    self.fetchProductByBarcode(cleanedBarcode, retryCount: 1, completion: completion)
 
                 }.resume()
-
                 return
             }
 
             if let error = error {
-                print("❌ Hata: \(error.localizedDescription)")
+                print("❌ GET hatası: \(error.localizedDescription)")
                 completion(nil)
                 return
             }
@@ -157,7 +167,7 @@ class FirestoreManager{
                 completion(nil)
                 return
             }
-            print("📦 Gelen ürünler JSON:\n", String(data: data, encoding: .utf8) ?? "Veri çözümlenemedi")
+
             do {
                 if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                     let product = Product(
@@ -177,7 +187,7 @@ class FirestoreManager{
                         salt: json["salt"] as? Double ?? 0,
                         saturated_fat: json["saturated_fat"] as? Double ?? 0,
                         sugars: json["sugars"] as? Int ?? 0,
-                        fiber: json["sodium"]as? Double ?? 0,
+                        fiber: json["sodium"] as? Double ?? 0,
                         analize: json["alerjenUyari"] as? String ?? "",
                         aiComment: json["yorum"] as? String ?? ""
                     )
@@ -193,7 +203,6 @@ class FirestoreManager{
 
         }.resume()
     }
-
 
     
     func fetchProductsByCategory(_ category: String, completion: @escaping ([Product])-> Void) {
