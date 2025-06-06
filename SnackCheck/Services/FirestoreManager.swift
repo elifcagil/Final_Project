@@ -104,6 +104,8 @@ class FirestoreManager{
         }
     
     func fetchProductByBarcode(_ barcode: String, completion: @escaping (Product?) -> Void) {
+        
+        
         guard let getURL = URL(string: "http://localhost:3000/api/products/\(barcode)") else {
             print("❌ Geçersiz GET URL")
             completion(nil)
@@ -404,9 +406,9 @@ class FirestoreManager{
                     let products: [Product] = jsonArray.compactMap { json in
                         return Product(
                             product_id: json["id"] as? String ?? "",
-                            product_name: json["productName"] as? String ?? "",
-                            product_brand: json["productBrands"] as? String ?? "",
-                            product_image: json["productImage"] as? String ?? "",
+                            product_name: json["name"] as? String ?? "",
+                            product_brand: json["brands"] as? String ?? "",
+                            product_image: json["image_url"] as? String ?? "",
                             category: json["categories"] as? String ?? "",
                             ingeridents: json["ingredients_text"] as? String ?? "",
                             food_values: json["nutriments"] as? [String: String] ?? [:],
@@ -580,3 +582,4 @@ class FirestoreManager{
 
     
 }
+
