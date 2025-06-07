@@ -18,6 +18,7 @@ class HomeCollectionViewCell: UICollectionViewCell {
     @IBOutlet var productBrandLabel: UILabel!
     @IBOutlet var productNameLabel: UILabel!
     @IBAction func addFavoritesButton(_ sender: UIButton) {
+        
         onTapFavorite?(product?.product_id)
     }
     
@@ -38,8 +39,9 @@ class HomeCollectionViewCell: UICollectionViewCell {
         } else {
             productImageView.image = UIImage(systemName: "photo") // fallback
         }
-
-        // ⭐ FAVORİ butonu
+        
+        
+        
         let image = product.isFavorites == true ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
         favoriteButton.setImage(image, for: .normal)
 

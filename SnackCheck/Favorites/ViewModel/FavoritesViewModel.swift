@@ -23,16 +23,18 @@ class FavoritesViewModel{
     
     func FetchFavorites() {
         firestoreManaher.fetchFavorites { [weak self] result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let favorites):
-                        self?.favoritesList = favorites
-                        self?.onFetched?(favorites)
-                    case .failure(let error):
-                        print("❌ Favori ürünler alınamadı: \(error.localizedDescription)")
-                    }
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let favorites):
+                    self?.favoritesList = favorites
+                    self?.onFetched?(favorites)
+                case .failure(let error):
+                    print("❌ Favori ürünler alınamadı: \(error.localizedDescription)")
                 }
             }
+            
+            
+        }
     }
     
     func deleteFavorite(item: Product) {

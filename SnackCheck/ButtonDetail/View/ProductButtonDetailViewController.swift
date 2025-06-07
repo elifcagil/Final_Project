@@ -79,18 +79,19 @@ class ProductButtonDetailViewController: UIViewController {
                 ViewModel.context = product.ingeridents
                 
             case "analize" :
-                ViewModel.buttonName = "Ürün Analizi"
-                ViewModel.context = "Gemini AI dan gelicek burası"
+                ViewModel.buttonName = "Analiz"
+                ViewModel.context = product.aiComment //burası productdetail viewmodelden gelicek viewmodel firestoremanagerden çekicek
                 
             case "alergen" :
                 ViewModel.buttonName = "Alerjen Uyarısı"
-                ViewModel.context = "Gemini AI dan gelecek"
+                ViewModel.context = product.analize//burası productdetail viewmodelden gelicek viewmodel firestoremanagerden çekicek
                 
             case "foodValue" :
                 ViewModel.buttonName = "Besin Değerleri"
                 ViewModel.context = "\(product.product_name!) ürünün besin değerleri aşağıdaki gibidir."
                 togoVC.loadViewIfNeeded() //daha diğer syafanın viewıv yüklenmediği için buradan erişitğimizden önce onun yüklenmesini sağlarız daha sonra stackview e erişim isteriz.
                 togoVC.stackviewAllpage.isHidden = false
+                togoVC.stackViewFoodValue.isHidden = false
             default:
                 break
             }

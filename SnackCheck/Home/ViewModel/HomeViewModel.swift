@@ -57,29 +57,35 @@ class HomeViewModel{
     }
     
     func FetchAllProduct(){
-//        firestoreManager.fetchProductListFromAPI{ [weak self] products in
-//            self?.productList = products
-//            self?.allProductList = products
-//            self?.onFetched?(products)
-//            
-//        }
+        firestoreManager.fetchAllProducts{ [weak self] products in
+            self?.productList = products
+            self?.allProductList = products
+            self?.onFetched?(products)
+            
+        }
     }
     
     func searchFunc(searchedWord: String) {
-        // Önce boşluğu kontrol et
-        guard !searchedWord.isEmpty else {
+        // 🔎 Boşluk ve newline temizliği
+        let cleanedWord = searchedWord.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // 🔙 Eğer boşsa tüm ürünleri geri yükle
+        guard !cleanedWord.isEmpty else {
             productList = allProductList
             onFetched?(productList)
             return
         }
 
-        firestoreManager.fetchProductByBarcode(searchedWord) { [weak self] product in
+        // 🔁 Firestore'da var mı kontrol et (ve yoksa ekle → getir)
+        firestoreManager.fetchProductByBarcode(cleanedWord) { [weak self] product in
             DispatchQueue.main.async {
                 if let product = product {
-                    self?.productList = [product] // sadece bir ürün gösterilecek
+                    self?.productList = [product] // 🔥 Ürünü sonuçlara ekle
                 } else {
-                    self?.productList = [] // sonuç yok
+                    self?.productList = [] // ❌ Ürün bulunamadı
                 }
+
+                // 📢 UI'ya bildir
                 self?.onFetched?(self?.productList ?? [])
             }
         }
